@@ -94,7 +94,7 @@ def display_loadbalancer_check_output(expected_ips, apiserver_ip_counts):
     logging.info(log_line)
 
 
-def perform_apiserver_loadbalancer_checks(api_client, v1, retries=30, pass_threshold=0.5):
+def perform_apiserver_loadbalancer_checks(api_client, v1, retries=100, pass_threshold=0.5):
     """
 
     Parameters
