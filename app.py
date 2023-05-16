@@ -76,9 +76,13 @@ def get_apiserver_serveraddress(api_client):
     -------
 
     """
+    # logging.getLogger("urllib3").setLevel(logging.DEBUG) #TODO: Add argument to enable debug for this app. and put this in an if
+    
+    api_client.rest_client.pool_manager.clear() #HACK: Force the kube api_client to close old connections.
     resp, status_code, headers = api_client.call_api('/api', 'GET', auth_settings=['BearerToken'], response_type='json',
                                                      _preload_content=False)
     api_resp = json.loads(resp.data.decode('utf-8'))
+    logging.debug( api_resp )
     api_ip_addresses = [address_tuple["serverAddress"] for address_tuple in api_resp["serverAddressByClientCIDRs"]]
     # Filter any IPs with port numbers
     api_ip_addresses = [ip.split(":")[0] for ip in api_ip_addresses]
