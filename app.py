@@ -76,9 +76,11 @@ def get_apiserver_serveraddress(api_client):
     -------
 
     """
+    api_client.rest_client.pool_manager.clear() #HACK: Force the kube api_client to close old connections.
     resp, status_code, headers = api_client.call_api('/api', 'GET', auth_settings=['BearerToken'], response_type='json',
                                                      _preload_content=False)
     api_resp = json.loads(resp.data.decode('utf-8'))
+
     api_ip_addresses = [address_tuple["serverAddress"] for address_tuple in api_resp["serverAddressByClientCIDRs"]]
     # Filter any IPs with port numbers
     api_ip_addresses = [ip.split(":")[0] for ip in api_ip_addresses]
@@ -122,7 +124,7 @@ def perform_apiserver_loadbalancer_checks(api_client, v1, retries=100, pass_thre
         raise Exception("Not all expected APIServers were seen in responses. This may indicate sticky sessions.")
 
     # Warn if pass_threshold is not met
-    for api_ip, count in apiserver_ip_counts:
+    for api_ip, count in apiserver_ip_counts.items():
         if count < ((retries / expected_num_of_apiservers) * pass_threshold):
             raise Exception(
                 f"APIServers is heavily uneven. Expected {retries / expected_num_of_apiservers} for each IP. Failed on {api_ip}.")
