@@ -1,2 +1,2 @@
 kubernetes~=26.1.0
-urllib3==2.0.2
+urllib3==2.0.6
